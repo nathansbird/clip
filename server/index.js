@@ -54,7 +54,7 @@ io.on('connection', function(socket){
         object.x = Math.abs(object.x - object.x2) > 200 ? -1 : object.x;
         object.y = Math.abs(object.y - object.y2) > 200 ? -1 : object.y;
 
-        if(object.x2 == -1){
+        if(object.x2 == -1 || object.y2 == -1){
             socket.emit('die', 'Nice Try Josh ;)');
             socket.disconnect();
             return;
