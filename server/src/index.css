@@ -21,6 +21,8 @@ canvas{
     height: 100vh; 
     width: 100vw; 
     display: block;
+    cursor: none;
+    z-index: 1;
 }
 input{
     border: none;
@@ -30,6 +32,12 @@ input{
     text-align: center;
     outline: none;
     background: none;
+    display: block;
+    z-index: 2;
+    cursor: none;
+}
+body.success input{
+    display: none;
 }
 .success{
     background-color: #ffffff;
@@ -40,14 +48,86 @@ body.dead{
 body.error{
     background-color: #220000;
 }
-#lowerText.dead{
-    color: #eee;
-}
-#lowerText{
+body #lowerText{
     font-family: 'Product Sans', monospace;
     font-size: 1.5rem;
     color: #000;
     text-align: center;
     position: absolute;
     bottom: 0;
+}
+body.dead #lowerText{
+    color: #eee;
+}
+.icon{
+    height: 24px;
+    width: 24px;
+}
+body.success .icons{
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+body .icons{
+    display: none;
+}
+
+.icons div{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+body .icons.black div img,
+body.dead .icons.white div img{
+    opacity: 1.0;
+}
+
+body.dead .icons.black div img, 
+body .icons.white div img{
+    opacity: 0.0;
+}
+
+body.dead .icons.black div p, 
+body .icons.white div p{
+    opacity: 0.0;
+}
+
+body.dead .icons.white div p, 
+body .icons.black div p{
+    opacity: 1.0;
+}
+
+.white_text{
+    color: #fff;
+}
+
+.black_text{
+    color: #000;
+}
+
+.indicatorText{
+    font-family: 'Product Sans', monospace;
+    font-size: 1.0rem;
+    margin: 0px;
+    margin-left: 8px;
+}
+
+.icons div:not(:first-child){
+    margin-top: 16px;
+}
+#divider{
+    margin: 32px;
+    border-radius: 2px;
+    height: 4px;
+    width: 50%;
+    background-color: #fff;
+    display: block;
+}
+
+body.success #divider{
+    display: none;
 }
