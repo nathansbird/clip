@@ -5,7 +5,6 @@ const killSound = new Audio('/static/assets/kill.wav');
 const clipSound = new Audio('/static/assets/clip.wav');
 const dieSound = new Audio('/static/assets/die.wav');
 let socket;
-let connectionString;
 
 const maxX = 150;
 const maxY = 150;
@@ -27,15 +26,8 @@ let kills = 0;
 document.onkeypress = function(e){
     if(e.keyCode === 13){
         if(document.activeElement.id == "nameBox"){
-            document.getElementById('inputBox').focus();
-            return;
-        }
-
-        if(socket == null){
-            connectionString = document.getElementById('inputBox').value;
-            document.getElementById('inputBox').value = "";
-            connectToSocket(connectionString);
-        } else if(winner){
+            connectToSocket();
+        }else if(winner){
             socket.emit('reset');
         }
     }
@@ -71,8 +63,8 @@ document.onmousemove = function(e){
     endY = e.y;
 }
 
-function connectToSocket(room){
-    socket = io('http://192.168.'+room, {
+function connectToSocket(){
+    socket = io({
         reconnection: false,
         timeout: 2500
     });
@@ -91,15 +83,14 @@ function connectToSocket(room){
         document.getElementById('body').classList.add('error');
         document.getElementById('lowerText').innerHTML = "Error connecting, please try again";
         socket = null;
-        window.open("https://www.multisoftvirtualacademy.com/blog/differentiating-between-ethical-and-unethical-hacking/");
-    })
-    socket.on('connect', () => {
+    });
+    socket.on('connect', (socket) => {
         document.getElementById('body').classList.remove('error');
         document.getElementById('body').classList.remove('dead');
         document.getElementById('body').classList.add('success');
         isAlive = true;
         
-        document.getElementById('lowerText').innerHTML = connectionString;
+        document.getElementById('lowerText').innerHTML = "";
     });
     socket.on('die', (clipped) => {
         document.getElementById('lowerText').innerHTML = "Clipped By: "+clipped;
@@ -152,6 +143,10 @@ function updateCanvas(){
     }
 }
 
+let lastFrame = 0;
+let frameClock = 0;
+let clockValue = 30;
+
 function renderSquare(x, y, x2, y2, upDown){
     if(upDown == 1){
         context.beginPath();
@@ -172,7 +167,7 @@ function renderSquare(x, y, x2, y2, upDown){
 function emitSquare(){
     if(socket != null){
         let name = document.getElementById('nameBox').value;
-        socket.emit('position', {x: startX, y: startY, x2: endX, y2: endY, upDown: upDown, name: name});
+        socket.emit('position', {x: startX, y: startY, x2: endX, y2: endY, upDown: upDown, name: name, time: new Date().getTime()});
     }
 }
 
@@ -194,7 +189,7 @@ function cleanup(){
     upDown = 0;
     winner = false;
     document.getElementById('body').classList.remove('dead');
-    document.getElementById('lowerText').innerHTML = connectionString;
+    document.getElementById('lowerText').innerHTML = "";
 }
 
 function resizeCanvas() {

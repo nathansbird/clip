@@ -37,6 +37,7 @@ app.use('/static/assets', express.static(__dirname + '/src/assets'));
 app2.use('/static/assets', express.static(__dirname + '/src/assets'));
 
 let squares = {};
+let clipTimes = {};
 
 io.on('connection', function(socket){
     socketList[socket.id] = socket;
@@ -49,20 +50,25 @@ io.on('connection', function(socket){
             squares[socket.id] = {};
         }
 
-        object.x2 = Math.abs(object.x - object.x2) > 200 ? -1 : object.x2;
-        object.y2 = Math.abs(object.y - object.y2) > 200 ? -1 : object.y2;
-        object.x = Math.abs(object.x - object.x2) > 200 ? -1 : object.x;
-        object.y = Math.abs(object.y - object.y2) > 200 ? -1 : object.y;
+        object.x2 = Math.abs(object.x - object.x2) > 200 ? null : object.x2;
+        object.y2 = Math.abs(object.y - object.y2) > 200 ? null : object.y2;
+        object.x = Math.abs(object.x - object.x2) > 200 ? null : object.x;
+        object.y = Math.abs(object.y - object.y2) > 200 ? null : object.y;
 
-        if(object.x2 == -1 || object.y2 == -1){
-            socket.emit('die', 'Nice Try Josh ;)');
-            socket.disconnect();
+        if(object.x2 == null || object.y2 == null){
+            killHKR(socket, 'ANTI-CHEAT');
             return;
         }
 
         squares[socket.id].props = object;
     });
     socket.on('clip', function(){
+        if(clipTimes[socket.id] != null && new Date().getTime() - clipTimes[socket.id] < 100){
+            killHKR(socket, 'ANTI-SPAM');
+            return
+        }
+
+        clipTimes[socket.id] = new Date().getTime();
         evaluateClip(socket.id);
     });
     socket.on('reset', function(){
@@ -71,6 +77,10 @@ io.on('connection', function(socket){
         io.sockets.emit('cleanup');
     });
 });
+
+function killHKR(socket, reason){
+    socket.emit('die', reason);
+}
 
 let spectator;
 io2.on('connection', function(socket){
@@ -85,7 +95,10 @@ function emitSquares(){
         let newList = [];
         for(let key2 in squares){
             if(key2 != socketList[key].id && !squares[key2].isDead){
-                newList.push(squares[key2].props);
+                let props = squares[key2].props;
+                if(props.upDown == 1){
+                    newList.push(props);
+                }
             }
         }
 

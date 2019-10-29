@@ -7,29 +7,18 @@ let connectionString;
 
 let squareList = [];
 
-document.onkeypress = function(e){
-    if(e.keyCode === 13){
-        if(socket == null){
-            connectionString = document.getElementById('inputBox').value;
-            document.getElementById('inputBox').value = "";
-            connectToSocket(connectionString);
-        }
-    }
-}
-
-function connectToSocket(ip){
-    socket = io('http://192.168.'+ip+':4000', {
+connectToSocket();
+function connectToSocket(){
+    socket = io({
         reconnection: false,
-        timeout: 2500
+        timeout: 2500,
     });
 
-    document.getElementById('inputBox').style.display = "none";
     document.getElementById('lowerText').innerHTML = "Connecting...";
 
     socket.on('connect_error', (error) => {
         document.getElementById('body').classList.remove('dead');
         document.getElementById('body').classList.add('error');
-        document.getElementById('inputBox').style.display = "block";
         document.getElementById('lowerText').innerHTML = "Error connecting, please try again";
         socket = null;
     });
@@ -37,10 +26,9 @@ function connectToSocket(ip){
         document.getElementById('body').classList.remove('error');
         document.getElementById('body').classList.add('dead');
         
-        document.getElementById('lowerText').innerHTML = connectionString;
+        document.getElementById('lowerText').innerHTML = "";
     });
     socket.on('updateSquares', (squares) => {
-        console.log('updateSquares');
         if(squares != null){
             squareList = squares;
         }
@@ -52,6 +40,7 @@ function connectToSocket(ip){
         cleanup();
     });
 }
+
 
 function updateCanvas(){
     context.clearRect(0, 0, canvas.width, canvas.height);
