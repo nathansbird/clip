@@ -11,13 +11,15 @@ const maxY = 150;
 
 let squareList = [];
 
-let startX;
-let startY;
+let startX = 0;
+let startY = 0;
+let endX = 0;
+let endY = 0;
 
 let upDown = 0;
 
-let endX;
-let endY;
+let mouseX = 0;
+let mouseY = 0;
 
 let isAlive = false;
 let winner = false;
@@ -47,20 +49,28 @@ document.onmouseup = function(e){
 }
 
 document.onmousemove = function(e){
-    if(e.x > startX && e.x - startX > maxX){
-        startX = e.x - maxX;
-    } else if(e.x < startX && startX - e.x > maxX){
-        startX = e.x + maxX;
+    mouseX = e.x;
+    mouseY = e.y;
+}
+
+function glideFrame(){
+    let vx = (mouseX - endX) / 4
+    let vy = (mouseY - endY) / 4;
+
+    endX += vx;
+    endY += vy;
+
+    if(endX > startX && endX - startX > maxX){
+        startX = endX - maxX;
+    } else if(endX < startX && startX - endX > maxX){
+        startX = endX + maxX;
     }
 
-    if(e.y > startY && e.y - startY > maxY){
-        startY = e.y - maxY;
-    } else if(e.y < startY && startY - e.y > maxY){
-        startY = e.y + maxY;
+    if(endY > startY && endY - startY > maxY){
+        startY = endY - maxY;
+    } else if(endY < startY && startY - endY > maxY){
+        startY = endY + maxY;
     }
-
-    endX = e.x;
-    endY = e.y;
 }
 
 function connectToSocket(){
@@ -117,6 +127,8 @@ function connectToSocket(){
 }
 
 function updateCanvas(){
+    glideFrame();
+
     context.clearRect(0, 0, canvas.width, canvas.height);
     resizeCanvas()
     context.fillStyle = isAlive ? '#000' : '#fff';
@@ -198,5 +210,5 @@ function resizeCanvas() {
 }
 
 //canvas render clock
-setInterval(updateCanvas, 1000/48);
-setInterval(emitSquare, 1000/20);
+setInterval(updateCanvas, 1000/60);
+setInterval(emitSquare, 1000/30);

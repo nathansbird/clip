@@ -50,10 +50,10 @@ io.on('connection', function(socket){
             squares[socket.id] = {};
         }
 
-        object.x2 = Math.abs(object.x - object.x2) > 200 ? null : object.x2;
-        object.y2 = Math.abs(object.y - object.y2) > 200 ? null : object.y2;
-        object.x = Math.abs(object.x - object.x2) > 200 ? null : object.x;
-        object.y = Math.abs(object.y - object.y2) > 200 ? null : object.y;
+        object.x2 = Math.abs(object.x - object.x2) > 160 ? null : object.x2;
+        object.y2 = Math.abs(object.y - object.y2) > 160 ? null : object.y2;
+        object.x = Math.abs(object.x - object.x2) > 160 ? null : object.x;
+        object.y = Math.abs(object.y - object.y2) > 160 ? null : object.y;
 
         if(object.x2 == null || object.y2 == null){
             killHKR(socket, 'ANTI-CHEAT');
