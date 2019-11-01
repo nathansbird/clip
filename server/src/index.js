@@ -4,6 +4,7 @@ const context = canvas.getContext("2d");
 const killSound = new Audio('/static/assets/kill.wav');
 const clipSound = new Audio('/static/assets/clip.wav');
 const dieSound = new Audio('/static/assets/die.wav');
+var extraKeyFunction = null;
 let socket;
 
 const maxX = 150;
@@ -33,6 +34,10 @@ document.onkeypress = function(e){
             socket.emit('reset');
         }
     }
+
+    if(extraKeyFunction != null){
+        extraKeyFunction(e);
+    }
 }
 
 document.onmousedown = function(e){
@@ -54,8 +59,8 @@ document.onmousemove = function(e){
 }
 
 function glideFrame(){
-    let vx = (mouseX - endX) / 4
-    let vy = (mouseY - endY) / 4;
+    let vx = (mouseX - endX) / 3;
+    let vy = (mouseY - endY) / 3;
 
     endX += vx;
     endY += vy;
