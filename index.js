@@ -1,10 +1,7 @@
 const express = require('express');
 const app = express();
-const app2 = express();
 const http = require('http').createServer(app);
-const http2 = require('http').createServer(app2);
 const io = require('socket.io')(http);
-const io2 = require('socket.io')(http2);
 
 let socketList = {};
 let clippedAmount = 0;
@@ -21,20 +18,7 @@ app.get('/index.js', function(req, res){
     res.sendFile(__dirname + '/src/index.js');
 });
 
-app2.get('/', function(req, res){
-    res.sendFile(__dirname + '/src/spectator/index.html');
-});
-
-app2.get('/index.css', function(req, res){
-    res.sendFile(__dirname + '/src/spectator/index.css');
-});
-
-app2.get('/index.js', function(req, res){
-    res.sendFile(__dirname + '/src/spectator/index.js');
-});
-
 app.use('/static/assets', express.static(__dirname + '/src/assets'));
-app2.use('/static/assets', express.static(__dirname + '/src/assets'));
 
 let squares = {};
 let clipTimes = {};
@@ -82,11 +66,6 @@ function killHKR(socket, reason){
     socket.emit('die', reason);
 }
 
-let spectator;
-io2.on('connection', function(socket){
-    spectator = socket;
-});
-
 function emitSquares(){
     let relevantLists = {};
     let allList = [];
@@ -114,10 +93,6 @@ function emitSquares(){
     for(let key in socketList){
         socketList[key].emit('updateSquares', relevantLists[socketList[key].id]);
     }
-
-    if(spectator != null){
-        spectator.emit('updateSquares', allList);
-    }
 }
 
 function evaluateClip(id){
@@ -132,9 +107,6 @@ function evaluateClip(id){
                 clippedAmount++;
                 if(squaresAlive() == 1){
                     socketList[id].emit('win');
-                    if(spectator != null){
-                        spectator.emit('winner', squares[id].props.name);
-                    }
                 }
             }
         }
@@ -165,6 +137,6 @@ function isInside(clipper, target){
 
 setInterval(emitSquares, 1000/20);
 
-http.listen(3000, function(){
+http.listen(process.env.PORT || 3000, function(){
   console.log('listening on port:3000');
 });
