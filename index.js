@@ -165,10 +165,6 @@ function isInside(clipper, target){
 
 setInterval(emitSquares, 1000/20);
 
-http.listen(80, function(){
-  console.log('listening on *:80');
-});
-
-http2.listen(4000, function(){
-    console.log('listening on *:4000');
+http.listen(3000, function(){
+  console.log('listening on port:3000');
 });
